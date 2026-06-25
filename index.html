@@ -1,0 +1,681 @@
+<!DOCTYPE html>
+<html lang="kk">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>МОДО Дайындық Жүйесі</title>
+    <script type="text/javascript" src="https://gc.kis.v2.scr.kaspersky-labs.com/FD126C42-EBFA-4E12-B309-BB3FDD723AC1/main.js?attr=X7WspaucYj_Sj34BiMp_0apAnsABS93OTXVkPvukgIV8eOGDcYQZRiCZj0z3FHauAbyZmkJtnxjsF_LmS9nEkFwFRtn7rU6mp4t6HI4GtQ3mcWP65epY3TxndfLgKyMIzt5NOYFYKmZzCakF-kYBjhVipwAtZvYxLJP9VXk2ydUtcmCzVUmVsjFNXTpyae5HrDP0Pk5ElnL2Is4VmvpoApb0xX7iZcW-_7eQVy5FveA9VMt4e2Nwoe1B0X7zteFgP4aCMDbiQZK-kkcrSGOBcOXovBCMk4zUXcgyABmAWVY814bFYG0hoNRSjI7SSWfDaxfERT_VYOFdiaYBS8WExA" charset="UTF-8"></script><script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        .page { display: none; }
+        .page.active { display: block; }
+.tab-btn{
+padding:10px 20px;
+border:none;
+background:#f1f5f9;
+cursor:pointer;
+font-weight:bold;
+margin-right:4px;
+}
+
+.tab-btn.active{
+background:#2563eb;
+color:white;
+}
+
+    </style>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</head>
+<body class="bg-slate-50 min-h-screen p-4 md:p-8 text-slate-800">
+
+    <div id="app" class="max-w-2xl mx-auto bg-white rounded-2xl shadow-sm border border-slate-200 p-6 md:p-10">
+        
+        <!-- Бет 1: Тіркелу -->
+        <div id="page-registration" class="page active">
+            <h1 class="text-4xl font-bold mb-5 text-center text-blue-700">MODOschool</h1> 
+            <h2 class="text-center text-blue-700"><i>"training simulator"</i></h2>
+             
+            <div class="space-y-4">
+                <div>
+                    <label class="block text-sm font-medium mb-1">Аты-жөні:</label>
+                    <input type="text" id="username" class="w-full p-3 border border-slate-300 rounded-lg focus:ring-2 focus:ring-blue-500 outline-none" placeholder="Мысалы: Алиев Али">
+                </div>
+                <div>
+                    <label class="block text-sm font-medium mb-1">Сынып:</label>
+                    <select id="usergrade" class="w-full p-3 border border-slate-300 rounded-lg focus:ring-2 focus:ring-blue-500 outline-none">
+                        <option value="4">4-сынып</option>
+                        <option value="9">9-сынып</option>
+                    </select>
+                </div>
+                <button onclick="registerUser()" class="w-full bg-blue-600 hover:bg-blue-700 text-white font-semibold py-3 rounded-lg transition">Тіркелу</button>
+            </div>
+        </div>
+
+        <!-- Бет 2: Тестілеу -->
+        <div id="page-test" class="page">
+            <div class="flex justify-between items-start mb-6">
+
+    <h2 id="test-title"
+        class="text-xl font-bold">
+    </h2>
+
+    <div class="text-right">
+
+        <span id="user-display"
+              class="text-sm bg-slate-100 px-3 py-1 rounded-full inline-block">
+        </span>
+
+        <p id="timer"
+           class="text-blue-700 font-bold text-lg mt-3">
+
+            Қалған уақыт: 00:00
+
+        </p>
+
+    </div>
+
+</div>
+            <form id="quiz-form" class="space-y-6">
+              <div id="subject-tabs"
+     class="flex border-b mb-6">
+</div>
+
+<div id="question-nav"
+class="flex gap-2 flex-wrap mb-4">
+</div>
+
+
+<div class="w-full bg-slate-200 rounded-full h-4 mb-2">
+
+<div id="progress-bar"
+class="bg-green-500 h-4 rounded-full"
+style="width:0%">
+</div>
+
+</div>
+
+<p id="progress-text"
+class="text-sm mb-4">
+
+Орындалуы: 0/0 (0%)
+
+</p>
+
+
+
+
+                <div id="questions-container" class="space-y-6"></div>
+
+                <button type="submit" class="w-full bg-emerald-600 hover:bg-emerald-700 text-white font-bold py-3 rounded-lg">Тестті аяқтау</button>
+            </form>
+        </div>
+
+        <!-- Бет 3: Нәтиже -->
+        <div id="page-results" class="page">
+            <h2 class="text-2xl font-bold mb-4 text-center">Тест аяқталды!</h2>
+            <p id="score-text" class="text-lg mb-6 text-center font-bold text-blue-700"></p>
+            <div class="my-6 flex justify-center">
+                <div style="width:350px;height:350px;">
+                    <canvas id="resultChart"></canvas>
+                </div>
+            </div>
+            
+            <!-- Мониторинг кестесі -->
+            <div class="mt-6">
+                <h3 class="font-bold text-lg border-b pb-2 mb-3">Нәтижелер мониторингі:</h3>
+                <div class="overflow-x-auto">
+                    <table class="w-full text-sm text-left border">
+                        <thead class="bg-slate-100 uppercase">
+                            <tr>
+                                <th class="p-2">Күні</th>
+                                <th class="p-2">Сынып</th>
+                                <th class="p-2">Нәтиже</th>
+                            </tr>
+                        </thead>
+                        <tbody id="history-table"></tbody>
+                    </table>
+                </div>
+            </div>
+
+            <!-- Қатемен жұмыс -->
+            <div id="review-container" class="mt-8 space-y-4">
+                <h3 class="font-bold text-lg border-b pb-2">Қатемен жұмыс:</h3>
+                <div id="wrong-answers-list"></div>
+            </div>
+
+            <div class="mt-8 text-center">
+                <button onclick="location.reload()" class="bg-slate-800 hover:bg-slate-900 text-white px-8 py-3 rounded-lg">Жаңа тест бастау</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+       let userName = "";
+      let userGrade = "";
+      let currentTestData = [];
+     let resultChart = null;
+
+     let timeLeft = 0;
+     let timerInterval;
+
+     let subjects = [];
+     let currentSubject = 0;
+
+    async function loadQuestions(grade) {
+         const response = await fetch(`questions/grade${grade}.json`);
+         return await response.json();
+    }
+
+      
+
+        function drawChart(correct, total) {
+            const wrong = total - correct;
+            const ctx = document.getElementById('resultChart').getContext('2d');
+
+            if (resultChart) resultChart.destroy();
+
+            resultChart = new Chart(ctx, {
+                type: 'pie',
+                data: {
+                    labels: ['Дұрыс жауап', 'Қате жауап'],
+                    datasets: [{
+                        data: [correct, wrong],
+                        backgroundColor: ['#22c55e', '#ef4444'],
+                        borderWidth: 2
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    plugins: {
+                        legend: { position: 'bottom' }
+                    }
+                }
+            });
+        }
+
+        function showPage(pageId) {
+            document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+            document.getElementById('page-' + pageId).classList.add('active');
+        }
+
+        function registerUser() {
+            userName = document.getElementById('username').value;
+            userGrade = document.getElementById('usergrade').value;
+            if(!userName) { alert("Аты-жөніңізді енгізіңіз!"); return; }
+            document.getElementById('user-display').innerText = userName + " (" + userGrade + "-сынып)";
+            startTest(userGrade);
+        }
+
+    
+
+async function startTest(grade) {
+
+    currentTestData = await loadQuestions(grade);
+
+if(grade==="4"){
+
+timeLeft = 60*60;
+
+}
+else{
+
+timeLeft = 150*60;
+
+}
+
+subjects = [...new Set(currentTestData.map(q => q.subject))];
+
+const tabs = document.getElementById("subject-tabs");
+
+tabs.innerHTML = "";
+
+subjects.forEach((subject, index) => {
+
+    tabs.innerHTML += `<button
+type="button"
+class="tab-btn"
+id="tab-${index}"
+onclick="openTab(${index})">
+${subject} </button>`;
+
+});
+
+    if (grade === "4") {
+
+const math =
+    currentTestData
+    .filter(q => q.subject === "Математика")
+    .sort(() => Math.random() - 0.5)
+    .slice(0,10);
+
+const kaz =
+    currentTestData
+    .filter(q => q.subject === "Қазақ тілі")
+    .sort(() => Math.random() - 0.5)
+    .slice(0,10);
+
+const jara =
+    currentTestData
+    .filter(q => q.subject === "Жаратылыстану")
+    .sort(() => Math.random() - 0.5)
+    .slice(0,10);
+
+currentTestData = [
+    ...math,
+    ...kaz,
+    ...jara
+];
+
+
+}
+
+    
+
+    const container =
+document.getElementById('questions-container');
+
+container.innerHTML = '';
+
+let questionNumber = 1;
+
+subjects.forEach((subject,subjectIndex)=>{
+
+const panel=document.createElement('div');
+
+panel.id=`subject-${subjectIndex}`;
+
+panel.className='subject-panel';
+
+if(subjectIndex!==0){
+panel.style.display='none';
+}
+
+panel.innerHTML=
+`<h3 class="text-xl font-bold mb-4">
+${subject}
+
+</h3>`;
+
+const subjectQuestions=
+currentTestData.filter(
+q=>q.subject===subject
+);
+
+subjectQuestions.forEach((q, questionIndex)=>{
+
+const realIndex=
+currentTestData.indexOf(q);
+
+const div=document.createElement('div');
+
+div.className=
+'border-b border-slate-200 pb-4 mb-4';
+
+div.innerHTML=
+`<p class="font-semibold mb-3">
+${questionIndex + 1}. ${q.question}
+
+</p>`;
+
+q.options.forEach(opt=>{
+
+div.innerHTML+=`<label class="flex items-center space-x-3 p-2"> <input
+type="radio"
+name="q${realIndex}"
+value="${opt}"
+onchange="updateProgress();checkSubjectDone()"> <span>${opt}</span> </label>`;
+
+});
+
+panel.appendChild(div);
+
+});
+
+container.appendChild(panel);
+
+});
+openTab(0);
+
+showPage('test');
+startTimer();
+
+}
+
+
+function checkSubjectDone(){
+
+subjects.forEach((subject,subjectIndex)=>{
+
+const subjectQuestions =
+currentTestData.filter(
+q => q.subject === subject
+);
+
+let done = true;
+
+subjectQuestions.forEach((q)=>{
+
+const realIndex =
+currentTestData.indexOf(q);
+
+const checked =
+document.querySelector(
+`input[name="q${realIndex}"]:checked`
+);
+
+if(!checked){
+done = false;
+}
+
+});
+
+const tab =
+document.getElementById(
+`tab-${subjectIndex}`
+);
+
+if(done){
+tab.innerHTML =
+"✓ " + subject;
+}
+
+});
+
+}
+
+
+function openTab(index){
+
+document
+.querySelectorAll('.tab-btn')
+.forEach(btn=>
+btn.classList.remove('active')
+);
+
+document
+.getElementById(`tab-${index}`)
+.classList.add('active');
+
+document
+.querySelectorAll('.subject-panel')
+.forEach(panel=>
+panel.style.display='none'
+);
+
+document
+.getElementById(`subject-${index}`)
+.style.display='block';
+
+renderQuestionNav(index);
+
+}
+
+
+function startTimer(){
+
+clearInterval(timerInterval);
+
+timerInterval = setInterval(()=>{
+
+timeLeft--;
+
+const hours =
+Math.floor(timeLeft/3600);
+
+const minutes =
+Math.floor((timeLeft%3600)/60);
+
+const seconds =
+timeLeft%60;
+
+document.getElementById("timer").innerText =
+"Қалған уақыт: "
++
+String(hours).padStart(2,"0")
++
+":"
++
+String(minutes).padStart(2,"0")
++
+":"
++
+String(seconds).padStart(2,"0");
+
+if(timeLeft<=0){
+
+clearInterval(timerInterval);
+
+alert("Уақыт аяқталды!");
+
+document.getElementById("quiz-form")
+.requestSubmit();
+
+}
+
+},1000);
+
+}
+
+
+function updateProgress(){
+
+const total =
+currentTestData.length;
+
+let answered = 0;
+
+currentTestData.forEach((q,index)=>{
+
+const checked =
+document.querySelector(
+`input[name="q${index}"]:checked`
+);
+
+if(checked){
+answered++;
+}
+
+});
+
+const percent =
+Math.round(answered/total*100);
+
+document.getElementById(
+'progress-bar'
+).style.width =
+percent + "%";
+
+document.getElementById(
+'progress-text'
+).innerText =
+`Орындалуы: ${answered}/${total} (${percent}%)`;
+renderQuestionNav(currentSubject);
+}
+
+function renderQuestionNav(subjectIndex){
+
+    const subjectName = subjects[subjectIndex];
+
+    const subjectQuestions = currentTestData.filter(
+        q => q.subject === subjectName
+    );
+
+    const nav = document.getElementById("question-nav");
+
+    nav.innerHTML = "";
+
+    subjectQuestions.forEach((q,index)=>{
+
+        const realIndex = currentTestData.indexOf(q);
+
+        const checked =
+            document.querySelector(
+                `input[name="q${realIndex}"]:checked`
+            );
+
+        const circle = document.createElement("div");
+
+        circle.style.width = "35px";
+        circle.style.height = "35px";
+        circle.style.borderRadius = "50%";
+        circle.style.display = "flex";
+        circle.style.alignItems = "center";
+        circle.style.justifyContent = "center";
+        circle.style.fontWeight = "bold";
+        circle.style.cursor = "pointer";
+
+        if(checked){
+            circle.style.background = "#22c55e";
+            circle.style.color = "white";
+        }else{
+            circle.style.background = "#e5e7eb";
+            circle.style.color = "black";
+        }
+
+        circle.innerText = index + 1;
+
+        nav.appendChild(circle);
+
+    });
+
+}
+
+function saveResult(score) {
+    const history = JSON.parse(localStorage.getItem('modo_history') || '[]');
+
+    history.push({
+        date: new Date().toLocaleDateString(),
+        grade: userGrade,
+        score: score + '/' + currentTestData.length
+    });
+
+    localStorage.setItem('modo_history', JSON.stringify(history));
+    displayHistory();
+
+    const url =
+    "https://script.google.com/macros/s/AKfycbyU2m-pT1LJT4XOpHGO34cIULjNJUJ_DiCLml_eSCfI2uhJfis6VSjkN84myFEcuWnI/exec"
+    + "?name=" + encodeURIComponent(userName)
+    + "&grade=" + encodeURIComponent(userGrade)
+    + "&score=" + encodeURIComponent(score + "/" + currentTestData.length);
+
+    new Image().src = url;
+}
+
+
+
+        function displayHistory() {
+            const history = JSON.parse(localStorage.getItem('modo_history') || '[]');
+            const table = document.getElementById('history-table');
+            table.innerHTML = history.map(h => `
+                <tr class="border-b">
+                    <td class="p-2">${h.date}</td>
+                    <td class="p-2">${h.grade}-сынып</td>
+                    <td class="p-2 font-bold">${h.score}</td>
+                </tr>
+            `).join('');
+        }
+
+        document.getElementById('quiz-form').addEventListener('submit', function(e) {
+            e.preventDefault();
+            let score = 0;
+            let subjectStats = {};
+
+            const formData = new FormData(this);
+            const reviewList = document.getElementById('wrong-answers-list');
+            reviewList.innerHTML = '';
+            
+            currentTestData.forEach((q, index) => {
+if(!subjectStats[q.subject]){
+
+subjectStats[q.subject] = {
+correct:0,
+total:0
+};
+
+}
+
+subjectStats[q.subject].total++;
+
+                const userAns = formData.get(`q${index}`);
+                if (userAns === q.answer) {
+                    score++;
+                subjectStats[q.subject].correct++;
+                } else {
+                    reviewList.innerHTML += `<div class="p-3 bg-red-50 rounded mb-2">
+                        <p class="text-sm font-bold text-red-800">Сұрақ: ${q.question}</p>
+                        <p class="text-sm">Сіздің жауабыңыз: <span class="font-semibold">${userAns || 'Жауап берілмеді'}</span></p>
+                        <p class="text-sm text-emerald-700">Дұрыс жауап: <span class="font-semibold">${q.answer}</span></p>
+                    </div>`;
+                }
+            });
+
+            let report = "";
+const percent =
+Math.round(
+(score / currentTestData.length) * 100
+);
+
+let gradeText = "";
+
+if(percent >= 90){
+gradeText = "Өте жақсы 🏆";
+}
+else if(percent >= 75){
+gradeText = "Жақсы 👍";
+}
+else if(percent >= 50){
+gradeText = "Қанағаттанарлық 📘";
+}
+else{
+gradeText = "Қосымша дайындық қажет 📚";
+}
+
+for(const subject in subjectStats){
+
+report +=
+`${subject}: `
++
+subjectStats[subject].correct
++
+"/"
++
+subjectStats[subject].total
++
+"<br>";
+
+}
+
+document.getElementById(
+'score-text'
+).innerHTML =
+
+report +
+
+"<br><br>" +
+
+userName +
+
+", жалпы нәтиже: " +
+
+score +
+
+"/" +
+
+currentTestData.length +
+
+" (" +
+
+percent +
+
+"%)" +
+"<br><br>" +
+gradeText;
+
+
+            drawChart(score, currentTestData.length);
+            clearInterval(timerInterval);
+            saveResult(score);
+            showPage('results');
+        });
+    </script>
+</body>
+</html>
